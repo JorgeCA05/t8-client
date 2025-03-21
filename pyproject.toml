@@ -10,12 +10,37 @@ requires-python = ">=3.12"
 dependencies = [
     "click (>=8.1.8,<9.0.0)",
     "requests (>=2.32.3,<3.0.0)",
-    "pytest (>=8.3.5,<9.0.0)"
+    "pytest (>=8.3.5,<9.0.0)",
+    "numpy (>=2.2.4,<3.0.0)",
+    "python-dotenv (>=1.0.1,<2.0.0)"
 ]
 
 [tool.poetry]
 packages = [{include = "t8_client", from = "src"}]
 
+[tool.poetry.scripts]
+t8-client = "t8_client.main:cli"
+
+[tool.ruff.lint]
+select = [
+    "ARG", # flake8-unused-arguments
+    "B",   # flake8-bugbear - common bugs and anti-patterns
+    "C90", # McCabe complexity
+    "E",   # pycodestyle
+    "F",   # Pyflakes
+    "I",   # isort
+    "N",   # pep8-naming
+    "NPY", # flake8-numpy
+    "PL",  # pylint
+    "Q",   # flake8-quotes
+    "RET", # flake8-return
+    "RUF", # ruff-specific, import optimization and other
+    "SIM", # flake8-simplify
+    "UP",  # pyupgradej
+    "W",   # pycodestyle
+    "ANN", # flake8-annotations - Consistent type annotations
+]
+ignore = []
 
 [build-system]
 requires = ["poetry-core>=2.0.0,<3.0.0"]

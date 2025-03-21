@@ -1,8 +1,10 @@
+import csv
 from base64 import b64decode
-from datetime import UTC
+from datetime import UTC, datetime
 from struct import unpack
 from zlib import decompress
 
+import click
 import numpy as np
 import requests
 
@@ -40,6 +42,53 @@ def obtain_spectra(ctx, machine, point, pmode):
         return [item['_links']['self'] for item in data['_items']]
     else:
         return None
+
+
+
+
+
+
+def obtain_wave(ctx, machine, point, pmode, date):
+    host = ctx.obj['HOST']
+    user = ctx.obj['USER']
+    password = ctx.obj['PASSWORD']
+    # Convertir la fecha a timestamp
+    fecha_hora = datetime.strptime(date, '%Y-%m-%dT%H:%M:%S')
+    utc_time = fecha_hora.replace(tzinfo=UTC)
+    timestamp = int(utc_time.timestamp())
+    url = f"https://{host}/rest/waves/{machine}/{point}/{pmode}/{timestamp}"
+    response = requests.get(url, auth=(user, password))
+    if response.status_code == 200:
+        data = response.json()
+        return data
+    else:
+        return None
+
+def save_wave_to_csv(data, machine, point, pmode, datetime):
+    safe_date = datetime.replace(':', '-')
+    filename = f"{machine}_{point}_{pmode}_{safe_date}.csv"
+
+    srate = float(data['sample_rate'])
+    factor = float(data.get('factor', 1))
+    raw = data['data']
+    wave = decodificador['zint'](raw)
+
+    wave *= factor
+
+    t = np.linspace(0, len(wave) / srate, len(wave))
+
+    with open(filename, mode='w', newline='') as file:
+        writer = csv.writer(file)
+        writer.writerow(['timestamp', 'value'])
+        # Escribir datos
+        for timestamp, value in zip(t, wave):
+            writer.writerow([timestamp, value])
+
+
+
+
+
+
 
 
 def zint_to_float(raw):
