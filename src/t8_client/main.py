@@ -11,6 +11,8 @@ from t8_client.api import (
     obtain_wave,
     obtain_waves,
     parse_params,
+    ploting_spectra,
+    ploting_wave,
     save_spectra_to_csv,
     save_wave_to_csv,
 )
@@ -104,7 +106,36 @@ def get_spectra(ctx, machine, point, pmode, params, time):
 
 ###################################################   PLOT   ###########################
 
+@cli.command()
+@click.option('-M', '--machine', default=None, help='Machine')
+@click.option('-p', '--point', default=None, help='Point')
+@click.option('-m', '--pmode', default=None, help='Processing mode')
+@click.option('-P', '--params', default=None, help='Parameters in format -> M:P:PM')
+@click.option('-t', '--time', required=True, help='YYYY-MM-DDTHH:MM:SS')
+@click.pass_context
+def plot_wave(ctx, machine, point, pmode, params, time):
+    machine, point, pmode = parse_params(machine, point, pmode, params)
+    forma_de_onda = obtain_wave(ctx, machine, point, pmode, time)
+    if forma_de_onda:
+        ploting_wave(forma_de_onda)
+    else:
+        click.echo('Error ploting that waveform')
 
+
+@cli.command()
+@click.option('-M', '--machine', default=None, help='Machine')
+@click.option('-p', '--point', default=None, help='Point')
+@click.option('-m', '--pmode', default=None, help='Processing mode')
+@click.option('-P', '--params', default=None, help='Parameters in format -> M:P:PM')
+@click.option('-t', '--time', required=True, help='YYYY-MM-DDTHH:MM:SS')
+@click.pass_context
+def plot_spectrum(ctx, machine, point, pmode, params, time):
+    machine, point, pmode = parse_params(machine, point, pmode, params)
+    forma_de_onda = obtain_spectra(ctx, machine, point, pmode, time)
+    if forma_de_onda:
+        ploting_spectra(forma_de_onda)
+    else:
+        click.echo('Error ploting that spectra')
 
 
 

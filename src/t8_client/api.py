@@ -6,6 +6,7 @@ from zlib import decompress
 
 import click
 import numpy as np
+import pylab
 import requests
 
 
@@ -132,7 +133,44 @@ def save_spectra_to_csv(data, machine, point, pmode, datetime):
             writer.writerow([timestamp, value])
 
 
-##################################################  PLOT_WAVE  #########################
+##################################################  PLOTS  #########################
+
+def ploting_wave(data):
+    srate = float(data['sample_rate'])
+    factor = float(data.get('factor', 1))
+    raw = data['data']
+    wave = decodificador['zint'](raw)
+
+    wave *= factor
+
+    t = np.linspace(0, len(wave) / srate, len(wave))
+
+    pylab.plot(t, wave)
+    pylab.title('Waveform')
+    pylab.grid(True)
+    pylab.show()
+
+
+def ploting_spectra(data):
+    fmin = data.get('min_freq', 0)
+    fmax = data['max_freq']
+    factor = data['factor']
+    raw = data['data']
+    sp = decodificador['zint'](raw)
+
+    sp *= factor
+
+    freq = np.linspace(fmin, fmax, len(sp))
+
+    pylab.plot(freq, sp)
+    pylab.title('Spectra')
+    pylab.grid(True)
+    pylab.show()
+
+
+
+
+
 
 
 
