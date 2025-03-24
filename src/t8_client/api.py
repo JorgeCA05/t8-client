@@ -3,21 +3,13 @@ from base64 import b64decode
 from datetime import UTC, datetime
 from struct import unpack
 from zlib import decompress
-
+import os
 import click
 import numpy as np
 import pylab
 import requests
 
 
-def url_generator(direccion, dato, nombre, punto_de_med, modo_proc, fecha_hora):
-    # Convertimos la fecha y hora a timestamp
-    utc_time = fecha_hora.replace(tzinfo=UTC)
-    timestamp = int(utc_time.timestamp())
-
-    URL = f'https://{direccion}{dato}/{nombre}/{punto_de_med}/{modo_proc}/{timestamp}'
-
-    return URL
 
 ################################################ COMMAND PROCESSING ####################
 
@@ -73,7 +65,7 @@ def obtain_wave(ctx, machine, point, pmode, date):
 
 def save_wave_to_csv(data, machine, point, pmode, datetime):
     safe_date = datetime.replace(':', '-')
-    filename = f"wave_{machine}_{point}_{pmode}_{safe_date}.csv"
+    filename = os.path.join('output/reports', f"wave_{machine}_{point}_{pmode}_{safe_date}.csv")
 
     srate = float(data['sample_rate'])
     factor = float(data.get('factor', 1))
@@ -113,7 +105,7 @@ def obtain_spectra(ctx, machine, point, pmode, date):
 
 def save_spectra_to_csv(data, machine, point, pmode, datetime):
     safe_date = datetime.replace(':', '-')
-    filename = f"spectra_{machine}_{point}_{pmode}_{safe_date}.csv"
+    filename = os.path.join('output/reports',f"spectra_{machine}_{point}_{pmode}_{safe_date}.csv")
 
     fmin = data.get('min_freq', 0)
     fmax = data['max_freq']
@@ -148,6 +140,7 @@ def ploting_wave(data):
     pylab.plot(t, wave)
     pylab.title('Waveform')
     pylab.grid(True)
+    pylab.savefig('wavefig')
     pylab.show()
 
 
@@ -165,6 +158,7 @@ def ploting_spectra(data):
     pylab.plot(freq, sp)
     pylab.title('Spectra')
     pylab.grid(True)
+    pylab.savefig('spectrafig')
     pylab.show()
 
 
